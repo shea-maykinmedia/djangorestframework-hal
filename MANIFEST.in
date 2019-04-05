@@ -1,0 +1,8 @@
+include *.rst
+include LICENSE
+recursive-include djangorestframework_hal *.html
+recursive-include djangorestframework_hal *.txt
+recursive-include djangorestframework_hal *.po
+global-exclude __pycache__
+global-exclude *.py[co]
+
