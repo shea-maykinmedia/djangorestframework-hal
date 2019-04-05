@@ -30,9 +30,6 @@ class HalJSONRenderer(JSONRenderer):
             return 'url'
 
     def get_url(self, renderer_context):
-        # lookup_value = getattr(obj, self.lookup_field)
-        # kwargs = {self.lookup_url_kwarg: lookup_value}
-        # return self.reverse(view_name, kwargs=kwargs, request=request, format=format)
         view = renderer_context['view']
 
         if view.action in ('create', 'list'):
@@ -52,6 +49,11 @@ class HalJSONRenderer(JSONRenderer):
         return renderer_context['view'].basename
 
     def _render_dict(self, data, renderer_context):
+        # if data is not a dict - return as is
+        if not isinstance(data, dict):
+            # TODO list processing
+            return data
+
         render_data = OrderedDict()
 
         link_data = OrderedDict()
@@ -65,7 +67,7 @@ class HalJSONRenderer(JSONRenderer):
             elif isinstance(value, dict):
                 embedded_data[item] = self._render_dict(value, renderer_context)
             elif isinstance(value, list):
-                embedded_data[item] = [self._render_dict(item, renderer_context) for item in data]
+                embedded_data[item] = [self._render_dict(item, renderer_context) for item in value]
             else:
                 render_data[item] = value
         if link_data:
@@ -76,6 +78,13 @@ class HalJSONRenderer(JSONRenderer):
         return render_data
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
+        renderer_context = renderer_context or {}
+        response = renderer_context.get('response')
+
+        # if we have an error, return data as-is
+        if response is not None and response.status_code >= 400:
+            return super().render(data, accepted_media_type, renderer_context)
+
         render_data = OrderedDict()
         if isinstance(data, list):
             url = self.get_url(renderer_context)
