@@ -1,6 +1,6 @@
 from .renderers import HalJSONRenderer
 from .settings import api_settings
-from .utils import transform_from_hal_to_json
+from .utils import parse_from_hal
 
 
 class HalJSONParser(api_settings.PARSER_CLASS):
@@ -10,5 +10,5 @@ class HalJSONParser(api_settings.PARSER_CLASS):
     def parse(self, stream, media_type=None, parser_context=None):
         data = super().parse(stream, media_type, parser_context)
 
-        parsed_data = transform_from_hal_to_json(data)
+        parsed_data = parse_from_hal(data)
         return parsed_data

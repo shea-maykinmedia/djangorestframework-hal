@@ -36,13 +36,18 @@ def unpack(transformed: Union[Embedded, Link, Primitive]) -> Union[OrderedDict, 
     return transformed
 
 
-def transform_dict(json_dict) -> Embedded:
+def render_dict(json_dict, paginated=False) -> Embedded:
     links = OrderedDict() 
     embedded = OrderedDict()
     data = OrderedDict()
 
     for k, v in json_dict.items():
-        transformed = transform_token(v)
+        #if empty string and pagination - move them to _links
+        if paginated \
+                and k in ('next', 'prev', 'first', 'last')\
+                and v is None:
+            transformed = Link(v)
+        transformed = render_token(v)
         
         if isinstance(transformed, Link):
             links[k] = {'href': transformed.link}
@@ -65,44 +70,32 @@ def transform_dict(json_dict) -> Embedded:
     return Embedded(transformed_dict)
 
 
-def transform_list(json_list) -> Embedded:
-    return Embedded([unpack(transform_token(token)) for token in json_list])
+def render_list(json_list) -> Embedded:
+    return Embedded([unpack(render_token(token)) for token in json_list])
 
 
-def transform_str(string) -> Union[Link, str]:
+def render_str(string) -> Union[Link, str]:
     if is_url(string):
         return Link(string)
     return string
 
 
-def transform_token(token) -> Union[Embedded, Link, Primitive]:
+def render_token(token, paginated=False) -> Union[Embedded, Link, Primitive]:
     if isinstance(token, str):
-        return transform_str(token)
+        return render_str(token)
 
     if isinstance(token, list):
-        return transform_list(token)
+        return render_list(token)
 
     if isinstance(token, dict):
-        return transform_dict(token)
+        return render_dict(token, paginated)
 
     # value primitives: int, float, bool, None
     return token
 
 
-def transform_from_json_to_hal(data, url: str, name: str) -> Union[OrderedDict, Primitive]:
-    token = data
-    if isinstance(data, list):
-        token = {
-            'url': url,
-            name: data
-        }
-
-    transformed = transform_token(token)
-    return unpack(transformed)
-
-
 # for parser
-def transform_from_hal_to_json(data):
+def parse_from_hal(data):
     if not isinstance(data, dict):
         return data
 
@@ -113,7 +106,7 @@ def transform_from_hal_to_json(data):
             parsed_data.update(link_data)
 
         elif item == '_embedded':
-            embedded_data = {k: transform_from_hal_to_json(v) for k, v in value.items()}
+            embedded_data = {k: parse_from_hal(v) for k, v in value.items()}
             parsed_data.update(embedded_data)
         else:
             parsed_data[item] = value

@@ -1,7 +1,9 @@
+from collections import OrderedDict
+
 from rest_framework.reverse import reverse
 
 from .settings import api_settings
-from .utils import transform_from_json_to_hal
+from .utils import render_token, unpack
 
 
 class HalJSONRenderer(api_settings.RENDERER_CLASS):
@@ -38,8 +40,20 @@ class HalJSONRenderer(api_settings.RENDERER_CLASS):
 
         url = self.get_url(renderer_context)
         name = self.get_view_name(renderer_context)
+        paginated = False
 
-        render_data = transform_from_json_to_hal(data, url, name)
+        if isinstance(data, list):
+            data = {
+                'url': url,
+                name: data
+            }
+        # if pagination
+        elif isinstance(data, dict):
+            if data and 'results' in data:
+                data[name] = data.pop('results')
+                paginated = True
+
+        render_data = unpack(render_token(data, paginated))
 
         res = super().render(render_data, accepted_media_type, renderer_context)
         return res
