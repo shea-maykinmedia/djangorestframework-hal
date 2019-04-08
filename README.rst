@@ -16,17 +16,12 @@ Welcome to djangorestframework_hal's documentation!
 
 |python-versions| |django-versions| |pypi-version|
 
-<One liner describing the project>
+HAL support for Django REST framework
 
 .. contents::
 
 .. section-numbering::
 
-Features
-========
-
-* ...
-* ...
 
 Installation
 ============
@@ -50,7 +45,37 @@ Install
 Usage
 =====
 
-<document or refer to docs>
+Add the render and parser to your django settings file.
+
+
+.. code-block:: python
+
+    REST_FRAMEWORK = {
+
+      'DEFAULT_RENDERER_CLASSES': (
+          'djangorestframework_hal.renderers.HalJSONRenderer',
+          # Any other renders
+      ),
+
+      'DEFAULT_PARSER_CLASSES': (
+          'djangorestframework_hal.parsers.HalJSONParser',
+          # Any other parsers
+      ),
+    }
+
+
+Swapping Renderer and Parser
+============================
+
+By default the package uses rest_framework.renderers.JSONRenderer.
+If you want to use another renderer , you must specify it in your django settings file.
+
+.. code-block:: python
+
+    HAL_JSON = {
+      'RENDERER_CLASS': 'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
+}
+
 
 
 
