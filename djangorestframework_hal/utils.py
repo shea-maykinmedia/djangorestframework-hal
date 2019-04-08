@@ -7,6 +7,7 @@ from django.core.validators import URLValidator
 Primitive = Union[str, float, int, bool, None]
 
 
+# for renderer
 class Link:
     def __init__(self, link):
         self.link = link
@@ -64,11 +65,11 @@ def transform_dict(json_dict) -> Embedded:
     return Embedded(transformed_dict)
 
 
-def transform_list(tokens) -> Embedded:
-    return Embedded([unpack(transform_token(token)) for token in tokens])
+def transform_list(json_list) -> Embedded:
+    return Embedded([unpack(transform_token(token)) for token in json_list])
 
 
-def transform_str(string: str) -> Union[Link, str]:
+def transform_str(string) -> Union[Link, str]:
     if is_url(string):
         return Link(string)
     return string
@@ -88,7 +89,7 @@ def transform_token(token) -> Union[Embedded, Link, Primitive]:
     return token
 
 
-def transform(data, url: str, name: str) -> Union[OrderedDict, Primitive]:
+def transform_from_json_to_hal(data, url: str, name: str) -> Union[OrderedDict, Primitive]:
     token = data
     if isinstance(data, list):
         token = {
@@ -98,3 +99,23 @@ def transform(data, url: str, name: str) -> Union[OrderedDict, Primitive]:
 
     transformed = transform_token(token)
     return unpack(transformed)
+
+
+# for parser
+def transform_from_hal_to_json(data):
+    if not isinstance(data, dict):
+        return data
+
+    parsed_data = {}
+    for item, value in data.items():
+        if item == '_links':
+            link_data = {k: v['href'] for k, v in value.items() if k != 'self'}
+            parsed_data.update(link_data)
+
+        elif item == '_embedded':
+            embedded_data = {k: transform_from_hal_to_json(v) for k, v in value.items()}
+            parsed_data.update(embedded_data)
+        else:
+            parsed_data[item] = value
+
+    return parsed_data

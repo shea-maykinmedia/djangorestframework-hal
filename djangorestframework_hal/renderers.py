@@ -1,13 +1,14 @@
-from rest_framework.renderers import JSONRenderer
 from rest_framework.reverse import reverse
 
-from djangorestframework_hal.utils import transform
+from .settings import api_settings
+from .utils import transform_from_json_to_hal
 
 
-class HalJSONRenderer(JSONRenderer):
+class HalJSONRenderer(api_settings.RENDERER_CLASS):
     media_type = "application/hal+json"
 
-    def get_url(self, renderer_context):
+    @staticmethod
+    def get_url(renderer_context):
         view = renderer_context['view']
 
         if view.action in ('create', 'list'):
@@ -23,7 +24,8 @@ class HalJSONRenderer(JSONRenderer):
         )
         return url
 
-    def get_view_name(self, renderer_context):
+    @staticmethod
+    def get_view_name(renderer_context):
         return renderer_context['view'].basename
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
@@ -37,8 +39,7 @@ class HalJSONRenderer(JSONRenderer):
         url = self.get_url(renderer_context)
         name = self.get_view_name(renderer_context)
 
-        render_data = transform(data, url, name)
+        render_data = transform_from_json_to_hal(data, url, name)
 
         res = super().render(render_data, accepted_media_type, renderer_context)
         return res
-
