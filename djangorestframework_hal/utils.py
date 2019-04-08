@@ -44,10 +44,11 @@ def render_dict(json_dict, paginated=False) -> Embedded:
     for k, v in json_dict.items():
         #if empty string and pagination - move them to _links
         if paginated \
-                and k in ('next', 'prev', 'first', 'last')\
+                and k in ('next', 'previous', 'first', 'last')\
                 and v is None:
             transformed = Link(v)
-        transformed = render_token(v)
+        else:
+            transformed = render_token(v)
         
         if isinstance(transformed, Link):
             links[k] = {'href': transformed.link}

@@ -50,6 +50,7 @@ class HalJSONRenderer(api_settings.RENDERER_CLASS):
         # if pagination
         elif isinstance(data, dict):
             if data and 'results' in data:
+                data['url'] = url
                 data[name] = data.pop('results')
                 paginated = True
 
