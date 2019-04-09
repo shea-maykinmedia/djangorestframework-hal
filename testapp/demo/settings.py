@@ -1,13 +1,18 @@
 import os
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = 'so-secret-i-cant-believe-you-are-looking-at-this'
+
+DEBUG = True
+
+ALLOWED_HOSTS = ['*']
+
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'djangorestframework_hal.db'),
+        'NAME': os.path.join(BASE_DIR, 'demo.db'),
     }
 }
 
@@ -16,10 +21,10 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.admin',
+    'django.contrib.messages',
 
     'djangorestframework_hal',
-
-    'testapp',
+    'demo_app.apps.DemoAppConfig',
 ]
 
 MIDDLEWARE = [
@@ -48,4 +53,7 @@ TEMPLATES = [
     },
 ]
 
-ROOT_URLCONF = 'testapp.urls'
+ROOT_URLCONF = 'demo.urls'
+
+
+WSGI_APPLICATION = 'demo.wsgi.application'
