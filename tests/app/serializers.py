@@ -26,4 +26,3 @@ class BookUrlSerializer(serializers.HyperlinkedModelSerializer):
                 'lookup_field': 'uuid',
             }
         }
-

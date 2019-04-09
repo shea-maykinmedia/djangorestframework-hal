@@ -1,11 +1,10 @@
 from rest_framework import viewsets
 
+from djangorestframework_hal.parsers import HalJSONParser
+from djangorestframework_hal.renderers import HalJSONRenderer
+
 from .models import Author, Book
 from .serializers import AuthorUrlSerializer, BookUrlSerializer
-
-# FIXME before
-from djangorestframework_hal.renderers import HalJSONRenderer
-from djangorestframework_hal.parsers import HalJSONParser
 
 
 # standart hyperlinked viewesets
@@ -36,4 +35,3 @@ class BookHalViewSet(viewsets.ModelViewSet):
     renderer_classes = (HalJSONRenderer,)
     parser_classes = (HalJSONParser,)
     lookup_field = 'uuid'
-

@@ -32,6 +32,7 @@ Requirements
 * Python 3.6 or above
 * setuptools 30.3.0 or above
 * Django 1.11 or above
+* Django REST Framework supporting the version of Django you are using
 
 
 Install
@@ -74,8 +75,14 @@ If you want to use another renderer , you must specify it in your django setting
 
     HAL_JSON = {
       'RENDERER_CLASS': 'djangorestframework_camel_case.render.CamelCaseJSONRenderer',
-}
+      }
 
+Test
+====
+
+.. code-block:: bash
+
+    python runtest tests.tests
 
 
 

@@ -2,8 +2,9 @@ from django.urls import include, path
 
 from rest_framework.routers import DefaultRouter
 
-from .viewsets import AuthorViewSet, BookViewSet, AuthorHalViewSet, BookHalViewSet
-
+from .viewsets import (
+    AuthorHalViewSet, AuthorViewSet, BookHalViewSet, BookViewSet
+)
 
 router = DefaultRouter()
 router.register(r'authors', AuthorViewSet)
