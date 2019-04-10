@@ -15,6 +15,9 @@ class Author(models.Model):
     def __str__(self):
         return f'Author: {self.name}'
 
+    class Meta:
+        ordering = ['id']
+
 
 class Book(models.Model):
     uuid = models.UUIDField(
