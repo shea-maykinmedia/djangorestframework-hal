@@ -1,9 +1,10 @@
+from rest_flex_fields.serializers import FlexFieldsSerializerMixin
 from rest_framework import serializers
 
 from .models import Author, Book
 
 
-class AuthorUrlSerializer(serializers.HyperlinkedModelSerializer):
+class AuthorUrlSerializer(FlexFieldsSerializerMixin, serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Author
         fields = ('url', 'name', 'email')
@@ -14,10 +15,13 @@ class AuthorUrlSerializer(serializers.HyperlinkedModelSerializer):
         }
 
 
-class BookUrlSerializer(serializers.HyperlinkedModelSerializer):
+class BookUrlSerializer(FlexFieldsSerializerMixin, serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Book
         fields = ('url', 'title', 'pages', 'author')
+        expandable_fields = {
+            'author': AuthorUrlSerializer
+        }
         extra_kwargs = {
             'url': {
                 'lookup_field': 'uuid',

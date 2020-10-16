@@ -37,6 +37,42 @@ class BookTests(APITestCase):
             }
         )
 
+    def test_book_retrieve_with_expand_property(self):
+        """
+        test /books/{id} GET:
+        """
+
+        author = Author.objects.create(name='Tolstoy')
+        book = Book.objects.create(author=author, pages=1000, title='War and peace')
+        book_url = reverse('book-detail', args=[book.uuid]) + "?expand=author"
+
+        response = self.client.get(book_url, HTTP_HOST='localhost')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.json(),
+            {
+                "_links": {
+                    "self": {
+                        "href": f"http://localhost/books_hal/{book.uuid}/"
+                    }
+                },
+                "_embedded": {
+                    "author": {
+                        "_links": {
+                            "self": {
+                                "href": f"http://localhost/authors_hal/{author.uuid}/"
+                            }
+                        },
+                        "name": "Tolstoy",
+                        "email": None
+                    }
+                },
+                "title": "War and peace",
+                "pages": 1000
+            }
+        )
+
     def test_book_list(self):
         """
         test /books GET:
@@ -75,6 +111,54 @@ class BookTests(APITestCase):
                 }
             }
 
+        )
+
+    def test_book_list_with_expand_property(self):
+        """
+        test /books GET:
+        """
+
+        author = Author.objects.create(name='Tolstoy')
+        book = Book.objects.create(author=author, pages=1000, title='War and peace')
+
+        book_list_url = reverse('book-list') + "?expand=author"
+
+        response = self.client.get(book_list_url, HTTP_HOST='localhost')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.json(),
+            {
+                "_links": {
+                    "self": {
+                        "href": "http://localhost/books_hal/"
+                    }
+                },
+                "_embedded": {
+                    "book": [
+                        {
+                            "_links": {
+                                "self": {
+                                    "href": f"http://localhost/books_hal/{book.uuid}/"
+                                }
+                            },
+                            "_embedded": {
+                                "author": {
+                                    "_links": {
+                                        "self": {
+                                            "href": f"http://localhost/authors_hal/{author.uuid}/"
+                                        }
+                                    },
+                                    "name": "Tolstoy",
+                                    "email": None
+                                }
+                            },
+                            "title": "War and peace",
+                            "pages": 1000
+                        }
+                    ]
+                }
+            }
         )
 
     def test_book_create(self):
