@@ -54,6 +54,8 @@ def render_dict(json_dict, paginated=False) -> Embedded:
             links[k] = {'href': transformed.link}
         elif isinstance(transformed, Embedded):
             embedded[k] = transformed.embedded
+            if "_links" in embedded[k]:
+                links[k] = transformed.embedded["_links"]["self"]
         else:
             data[k] = v
 

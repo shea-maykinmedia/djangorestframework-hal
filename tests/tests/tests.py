@@ -55,6 +55,9 @@ class BookTests(APITestCase):
                 "_links": {
                     "self": {
                         "href": f"http://localhost/books_hal/{book.uuid}/"
+                    },
+                    "author": {
+                        "href": f"http://localhost/authors_hal/{author.uuid}/"
                     }
                 },
                 "_embedded": {
@@ -140,6 +143,9 @@ class BookTests(APITestCase):
                             "_links": {
                                 "self": {
                                     "href": f"http://localhost/books_hal/{book.uuid}/"
+                                },
+                                "author": {
+                                    "href": f"http://localhost/authors_hal/{author.uuid}/"
                                 }
                             },
                             "_embedded": {
