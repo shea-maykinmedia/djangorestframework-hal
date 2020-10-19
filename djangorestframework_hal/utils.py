@@ -62,6 +62,14 @@ def render_dict(json_dict, paginated=False) -> Embedded:
     if 'url' in links:
         links['self'] = links.pop('url')
 
+    links_to_change = []
+    for link in links:
+        if '_links' in link:
+            links_to_change.append(link)
+
+    for link in links_to_change:
+        links[link.replace('_links', '')] = links.pop(link)
+
     transformed_dict = OrderedDict()
     if links:
         transformed_dict['_links'] = links
