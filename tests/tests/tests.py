@@ -76,6 +76,36 @@ class BookTests(APITestCase):
             }
         )
 
+    def test_book_retrieve_with_custom_url(self):
+        """
+        test /books/{id} GET:
+        """
+
+        author = Author.objects.create(name='Tolstoy')
+        book = Book.objects.create(author=author, pages=1000, title='War and peace')
+        book_url = reverse('custom-book-detail', args=[book.uuid])
+
+        response = self.client.get(book_url, HTTP_HOST='localhost')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.json()
+        author_url = reverse('author-detail', kwargs={'uuid': author.uuid})
+        book_url = reverse('book-detail', kwargs={'uuid': book.uuid})
+
+        self.assertEqual(
+            data,
+            {
+                '_links': {
+                    'author': {'href': f'http://localhost{author_url}'},
+                    'self': {'href': f'http://localhost{book_url}'},
+                    'custom': {'href': 'http://custom.com/link'}
+                },
+                'title': 'War and peace',
+                'pages': 1000
+            }
+        )
+
     def test_book_list(self):
         """
         test /books GET:
