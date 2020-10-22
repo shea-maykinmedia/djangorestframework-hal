@@ -2,7 +2,8 @@ from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
 
 from .models import Author, Book
-from .serializers import AuthorUrlSerializer, BookUrlSerializer, BookUrlSerializerWithCustomLink
+from .serializers import AuthorUrlSerializer, BookUrlSerializer, \
+    AuthorUrlSerializerWithCustomLink, BookUrlSerializerWithCustomLink
 
 from djangorestframework_hal.renderers import HalJSONRenderer
 from djangorestframework_hal.parsers import HalJSONParser
@@ -26,6 +27,15 @@ class BookViewSet(viewsets.ModelViewSet):
 class AuthorHalViewSet(viewsets.ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorUrlSerializer
+    renderer_classes = (HalJSONRenderer,)
+    parser_classes = (HalJSONParser,)
+    pagination_class = PageNumberPagination
+    lookup_field = 'uuid'
+
+
+class AuthorHalViewSetWithCustomLinkSerializer(viewsets.ModelViewSet):
+    queryset = Author.objects.all()
+    serializer_class = AuthorUrlSerializerWithCustomLink
     renderer_classes = (HalJSONRenderer,)
     parser_classes = (HalJSONParser,)
     pagination_class = PageNumberPagination

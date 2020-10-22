@@ -15,6 +15,29 @@ class AuthorUrlSerializer(FlexFieldsSerializerMixin, serializers.HyperlinkedMode
         }
 
 
+class AuthorUrlSerializerWithCustomLink(FlexFieldsSerializerMixin, serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Author
+        fields = ('url', 'name', 'email')
+        extra_kwargs = {
+            'url': {
+                'lookup_field': 'uuid',
+            }
+        }
+
+    def to_representation(self, *args, **kwargs):
+        representation = super().to_representation(*args, **kwargs)
+
+        representation['books_links'] = []
+        for author in self.instance:
+            for book in author.book_set.all().order_by('-pages'):
+                representation['books_links'].append({
+                    'url': f'http://localhost/author_hal/{author.uuid}/books_hal/{book.uuid}'
+                })
+
+        return representation
+
+
 class BookUrlSerializer(FlexFieldsSerializerMixin, serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Book

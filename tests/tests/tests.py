@@ -265,3 +265,68 @@ class BookTests(APITestCase):
                 'count': 2
             }
         )
+
+    def test_author_list_with_multiple_books(self):
+        """
+        test /authors GET: with pagination
+        """
+        author = Author.objects.create(name='Tolstoy', email='leo@tolstoy.ru')
+        book1 = Book.objects.create(author=author, pages=1000, title='War and peace')
+        book2 = Book.objects.create(author=author, pages=2000, title='Grapes of Wrath')
+
+        author_list_url = reverse('author-book-list')
+
+        response = self.client.get(author_list_url, HTTP_HOST='localhost')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.json()
+
+        self.maxDiff = None
+
+        self.assertEqual(
+            data,
+            {
+                "_links": {
+                    "next": {
+                        "href": None
+                    },
+                    "previous": {
+                        "href": None
+                    },
+                    "self": {
+                        "href": "http://localhost/authors_hal_custom/"
+                    }
+                },
+                "_embedded": {
+                    "author-book": [
+                        {
+                            "_links": {
+                                "self": {
+                                    "href": f"http://localhost/authors_hal/{author.uuid}/"
+                                },
+                                "books": [
+                                    {
+                                        "_links": {
+                                            "self": {
+                                                "href": f"http://localhost/author_hal/{author.uuid}/books_hal/{book2.uuid}"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "_links": {
+                                            "self": {
+                                                "href": f"http://localhost/author_hal/{author.uuid}/books_hal/{book1.uuid}"
+                                            }
+                                        }
+                                    }
+                                ]
+                            },
+                            "name": "Tolstoy",
+                            "email": "leo@tolstoy.ru"
+                        }
+                    ]
+                },
+                "count": 1
+            }
+        )
